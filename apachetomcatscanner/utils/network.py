@@ -6,15 +6,12 @@
 
 import socket
 
+import ssl
+import urllib3
 import requests
+
 # Disable warnings of insecure connection for invalid certificates
 requests.packages.urllib3.disable_warnings()
-# Allow use of deprecated and weak cipher methods
-requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-try:
-    requests.packages.urllib3.contrib.pyopenssl.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-except AttributeError:
-    pass
 
 
 def is_target_a_windows_machine(target) -> bool:
@@ -50,7 +47,7 @@ def is_http_accessible(target, port, config, scheme="http"):
             timeout=config.request_timeout,
             proxies=config.request_proxies,
             headers=config.request_http_headers,
-            verify=(not (config.request_no_check_certificate))
+            verify=False#(not (config.request_no_check_certificate))
         )
         return True
     except Exception as e:

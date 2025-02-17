@@ -10,16 +10,11 @@ import time
 import traceback
 import urllib.parse
 import re
-from apachetomcatscanner.utils.network import is_port_open, is_http_accessible
 import requests
+from apachetomcatscanner.utils.network import is_port_open, is_http_accessible
+
 # Disable warnings of insecure connection for invalid certificates
 requests.packages.urllib3.disable_warnings()
-# Allow use of deprecated and weak cipher methods
-requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-try:
-    requests.packages.urllib3.contrib.pyopenssl.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-except AttributeError:
-    pass
 
 
 def is_tomcat_manager_accessible(url_manager, config):
@@ -100,7 +95,7 @@ def try_credentials(url_manager, config):
                     "Authorization": "Basic " + base64.b64encode(auth_string).decode('utf-8')
                 }
             headers.update(config.request_http_headers)
-            
+
             r = requests.post(
                 url_manager,
                 headers=headers,
