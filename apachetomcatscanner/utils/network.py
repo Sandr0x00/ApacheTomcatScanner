@@ -47,7 +47,7 @@ def is_http_accessible(target, port, config, scheme="http"):
             timeout=config.request_timeout,
             proxies=config.request_proxies,
             headers=config.request_http_headers,
-            verify=False#(not (config.request_no_check_certificate))
+            verify=(not (config.request_no_check_certificate))
         )
         return True
     except Exception as e:
