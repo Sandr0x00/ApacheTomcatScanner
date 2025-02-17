@@ -10,16 +10,11 @@ import time
 import traceback
 import urllib.parse
 import re
-from apachetomcatscanner.utils.network import is_port_open, is_http_accessible
 import requests
+from apachetomcatscanner.utils.network import is_port_open, is_http_accessible
+
 # Disable warnings of insecure connection for invalid certificates
 requests.packages.urllib3.disable_warnings()
-# Allow use of deprecated and weak cipher methods
-requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-try:
-    requests.packages.urllib3.contrib.pyopenssl.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-except AttributeError:
-    pass
 
 
 def is_tomcat_manager_accessible(url_manager, config):
@@ -91,7 +86,7 @@ def get_version_from_malformed_http_request(url, config):
         return None
 
 
-def try_default_credentials(url_manager, config):
+def try_credentials(url_manager, config):
     found_credentials = []
     try:
         for credentials in config.credentials:
@@ -100,7 +95,7 @@ def try_default_credentials(url_manager, config):
                     "Authorization": "Basic " + base64.b64encode(auth_string).decode('utf-8')
                 }
             headers.update(config.request_http_headers)
-            
+
             r = requests.post(
                 url_manager,
                 headers=headers,
@@ -112,7 +107,7 @@ def try_default_credentials(url_manager, config):
                 found_credentials.append((r.status_code, credentials))
         return found_credentials
     except Exception as e:
-        config.debug("Error in get_version_from_malformed_http_request('%s'): %s " % (url_manager, e))
+        config.debug(f"Error : {e} ")
         return found_credentials
 
 
@@ -155,7 +150,7 @@ def process_url(scheme, target, port, url, config, reporter):
         if result["manager_accessible"]:
             config.debug("Manager is accessible")
             # Test for default credentials
-            credentials_found = try_default_credentials(url_manager, config)
+            credentials_found = try_credentials(url_manager, config)
 
         reporter.report_result(target, port, result, credentials_found)
 
